@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Biblioteca Digital — ESPOCH</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #f6f8fb;
+      --surface:   #ffffff;
+      --border:    #e4e8ef;
+      --accent:    #4f6ef7;
+      --accent-lt: #eef1fe;
+      --text:      #1a2035;
+      --muted:     #6b7a99;
+      --success:   #22c55e;
+      --warn:      #f59e0b;
+      --danger:    #ef4444;
+      --radius:    12px;
+      --shadow:    0 1px 4px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.04);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── NAV ────────────────────────────────── */
+    nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      height: 60px;
+      gap: 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-brand { font-weight: 700; font-size: 1rem; color: var(--accent); letter-spacing: -.3px; }
+    .nav-brand span { color: var(--muted); font-weight: 400; font-size: .85rem; margin-left: .4rem; }
+    .nav-links { display: flex; gap: .25rem; margin-left: auto; }
+    .nav-links a {
+      padding: .4rem .9rem;
+      border-radius: 8px;
+      font-size: .85rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: background .15s, color .15s;
+    }
+    .nav-links a:hover, .nav-links a.active { background: var(--accent-lt); color: var(--accent); }
+
+    /* ── LAYOUT ─────────────────────────────── */
+    main { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    section { display: none; }
+    section.active { display: block; }
+
+    h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 1.25rem; }
+    h3 { font-size: .95rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 1rem; }
+
+    /* ── STAT CARDS ─────────────────────────── */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      box-shadow: var(--shadow);
+    }
+    .stat-card .value { font-size: 2rem; font-weight: 800; color: var(--accent); line-height: 1; }
+    .stat-card .label { font-size: .8rem; color: var(--muted); margin-top: .3rem; }
+
+    /* ── CARD ───────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── TABLE ──────────────────────────────── */
+    .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+    thead tr { background: var(--bg); }
+    th { padding: .75rem 1rem; text-align: left; font-size: .75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid var(--border); }
+    td { padding: .75rem 1rem; border-bottom: 1px solid var(--border); color: var(--text); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--bg); }
+
+    /* ── BADGE ──────────────────────────────── */
+    .badge {
+      display: inline-block;
+      padding: .2rem .6rem;
+      border-radius: 999px;
+      font-size: .72rem;
+      font-weight: 600;
+    }
+    .badge-activo    { background: #dcfce7; color: #15803d; }
+    .badge-devuelto  { background: #f1f5f9; color: #64748b; }
+    .badge-libro_fisico  { background: #eff6ff; color: #1d4ed8; }
+    .badge-libro_digital { background: #faf5ff; color: #7e22ce; }
+    .badge-revista       { background: #fff7ed; color: #c2410c; }
+    .badge-tesis         { background: #f0fdf4; color: #15803d; }
+    .badge-audiolibro    { background: #fef2f2; color: #b91c1c; }
+
+    /* ── RESOURCE GRID ──────────────────────── */
+    .resource-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+    .resource-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.25rem;
+      box-shadow: var(--shadow);
+      transition: transform .15s, box-shadow .15s;
+    }
+    .resource-card:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,.1); }
+    .resource-card .rc-tipo { margin-bottom: .5rem; }
+    .resource-card .rc-titulo { font-weight: 600; font-size: .95rem; margin-bottom: .2rem; }
+    .resource-card .rc-autor  { font-size: .8rem; color: var(--muted); margin-bottom: .75rem; }
+    .resource-card .rc-footer { display: flex; justify-content: space-between; align-items: center; }
+    .rc-costo { font-weight: 700; color: var(--accent); }
+    .rc-codigo { font-size: .75rem; color: var(--muted); font-family: monospace; }
+
+    /* ── FORM ───────────────────────────────── */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media(max-width:600px){ .form-grid { grid-template-columns: 1fr; } }
+
+    label { display: block; font-size: .8rem; font-weight: 600; color: var(--muted); margin-bottom: .35rem; }
+    select, input {
+      width: 100%;
+      padding: .6rem .85rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: .875rem;
+      color: var(--text);
+      background: var(--surface);
+      transition: border-color .15s, box-shadow .15s;
+      appearance: none;
+    }
+    select:focus, input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79,110,247,.12);
+    }
+
+    .form-group { margin-bottom: 1rem; }
+    .form-row   { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: .75rem; align-items: end; margin-bottom: .75rem; }
+    @media(max-width:700px){ .form-row { grid-template-columns: 1fr 1fr; } }
+
+    /* ── BUTTONS ────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .6rem 1.2rem;
+      border-radius: 8px;
+      border: none;
+      font-size: .875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+    }
+    .btn:active { transform: scale(.98); }
+    .btn-primary  { background: var(--accent); color: #fff; }
+    .btn-primary:hover  { background: #3a58e0; }
+    .btn-outline  { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+    .btn-outline:hover  { background: var(--bg); }
+    .btn-danger   { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
+    .btn-sm       { padding: .35rem .75rem; font-size: .8rem; }
+
+    /* ── ALERT ──────────────────────────────── */
+    .alert {
+      padding: 1rem 1.25rem;
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+      font-size: .875rem;
+      display: none;
+    }
+    .alert.show { display: block; }
+    .alert-success { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+    .alert-error   { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+
+    /* ── RECURSOS ITEMS EN FORMULARIO ────────── */
+    #recursos-lista .item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .75rem 1rem;
+      margin-bottom: .5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr auto;
+      gap: .6rem;
+      align-items: center;
+      font-size: .82rem;
+    }
+    @media(max-width:700px){ #recursos-lista .item { grid-template-columns: 1fr 1fr; } }
+    .item-label { color: var(--muted); font-size: .72rem; }
+    .item-val   { font-weight: 500; }
+
+    /* ── EMPTY ──────────────────────────────── */
+    .empty { text-align: center; padding: 3rem; color: var(--muted); font-size: .9rem; }
+
+    /* ── SPINNER ────────────────────────────── */
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin .6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Biblioteca Digital <span>ESPOCH — Grupo 04</span></div>
+  <div class="nav-links">
+    <a href="#" class="active" onclick="showSection('dashboard',this)">Dashboard</a>
+    <a href="#" onclick="showSection('catalogo',this)">Catálogo</a>
+    <a href="#" onclick="showSection('historial',this)">Historial</a>
+    <a href="#" onclick="showSection('nuevo',this)">+ Préstamo</a>
+  </div>
+</nav>
+
+<main>
+
+  <!-- DASHBOARD ──────────────────────────────────────── -->
+  <section id="dashboard" class="active">
+    <h2>Dashboard</h2>
+    <div class="stats">
+      <div class="stat-card"><div class="value" id="stat-usuarios">—</div><div class="label">Usuarios registrados</div></div>
+      <div class="stat-card"><div class="value" id="stat-recursos">—</div><div class="label">Recursos en catálogo</div></div>
+      <div class="stat-card"><div class="value" id="stat-prestamos">—</div><div class="label">Préstamos totales</div></div>
+      <div class="stat-card"><div class="value" id="stat-activos">—</div><div class="label">Préstamos activos</div></div>
+    </div>
+
+    <div class="card">
+      <h3>Últimos préstamos</h3>
+      <div id="dash-historial"><div class="empty">Cargando…</div></div>
+    </div>
+  </section>
+
+  <!-- CATÁLOGO ───────────────────────────────────────── -->
+  <section id="catalogo">
+    <h2>Catálogo de recursos</h2>
+    <div id="catalogo-grid" class="resource-grid"><div class="empty">Cargando…</div></div>
+  </section>
+
+  <!-- HISTORIAL ──────────────────────────────────────── -->
+  <section id="historial">
+    <h2>Historial de préstamos</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Usuario</th><th>Fecha</th><th>Estado</th><th>Recursos</th><th>Costo total</th></tr></thead>
+        <tbody id="historial-body"><tr><td colspan="6" class="empty">Cargando…</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- NUEVO PRÉSTAMO ──────────────────────────────────── -->
+  <section id="nuevo">
+    <h2>Nuevo préstamo</h2>
+    <div id="alert-nuevo" class="alert"></div>
+
+    <div class="card">
+      <h3>Usuario</h3>
+      <div class="form-group">
+        <label>Seleccionar usuario</label>
+        <select id="sel-usuario"><option value="">— Cargando usuarios… —</option></select>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Agregar recursos</h3>
+      <div class="form-row">
+        <div>
+          <label>Tipo de recurso</label>
+          <select id="r-tipo" onchange="actualizarServicio()">
+            <option value="libro_fisico">Libro Físico</option>
+            <option value="libro_digital">Libro Digital</option>
+            <option value="revista">Revista</option>
+            <option value="tesis">Tesis</option>
+            <option value="audiolibro">Audiolibro</option>
+          </select>
+        </div>
+        <div>
+          <label>Título</label>
+          <input id="r-titulo" type="text" placeholder="Título del recurso" />
+        </div>
+        <div>
+          <label>Autor</label>
+          <input id="r-autor" type="text" placeholder="Autor" />
+        </div>
+        <div>
+          <label>Servicio adicional</label>
+          <select id="r-servicio">
+            <option value="EnvioDomicilio">Envío a domicilio (+$2.50)</option>
+          </select>
+        </div>
+        <div>
+          <button class="btn btn-outline" onclick="agregarRecurso()">+ Agregar</button>
+        </div>
+      </div>
+
+      <div id="recursos-lista"></div>
+      <div id="recursos-vacio" class="empty" style="padding:1.5rem">No has agregado recursos aún.</div>
+    </div>
+
+    <div class="card" style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:.85rem;color:var(--muted)">Costo estimado</div>
+        <div style="font-size:1.5rem;font-weight:800;color:var(--accent)" id="costo-total">$0.00</div>
+      </div>
+      <button class="btn btn-primary" id="btn-crear" onclick="crearPrestamo()">
+        Confirmar préstamo
+      </button>
+    </div>
+  </section>
+
+</main>
+
+<script>
+const API = 'http://localhost:7000/api';
+const SERVICIOS = {
+  libro_fisico:  [{ val:'EnvioDomicilio',     label:'Envío a domicilio (+$2.50)',       costo:2.50 }],
+  libro_digital: [{ val:'DescargaOffline',    label:'Descarga offline (+$1.00)',         costo:1.00 }],
+  revista:       [{ val:'PrestamoExtendido',  label:'Préstamo extendido (+$0.50/día)',   costo:3.50 }],
+  tesis:         [{ val:'CertificadoLectura', label:'Certificado de lectura (+$3.00)',   costo:3.00 }],
+  audiolibro:    [{ val:'AccesoPremium',      label:'Acceso premium (+$2.00)',           costo:2.00 }],
+};
+const COSTOS_BASE = { libro_fisico:3, libro_digital:1.5, revista:1, tesis:2, audiolibro:2.5 };
+
+let recursosLista = [];
+
+// ── Navegación ──────────────────────────────────────────
+function showSection(id, el) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  el.classList.add('active');
+  if (id === 'dashboard') loadDashboard();
+  if (id === 'catalogo')  loadCatalogo();
+  if (id === 'historial') loadHistorial();
+  if (id === 'nuevo')     loadUsuarios();
+  return false;
+}
+
+// ── Dashboard ───────────────────────────────────────────
+async function loadDashboard() {
+  const [usuarios, catalogo, historial] = await Promise.all([
+    fetch(`${API}/usuarios`).then(r=>r.json()),
+    fetch(`${API}/catalogo`).then(r=>r.json()),
+    fetch(`${API}/historial`).then(r=>r.json()),
+  ]);
+  document.getElementById('stat-usuarios').textContent  = usuarios.length;
+  document.getElementById('stat-recursos').textContent  = catalogo.length;
+  document.getElementById('stat-prestamos').textContent = historial.length;
+  document.getElementById('stat-activos').textContent   = historial.filter(p=>p.estado==='activo').length;
+
+  const tbody = document.getElementById('dash-historial');
+  if (!historial.length) { tbody.innerHTML='<div class="empty">Sin préstamos aún.</div>'; return; }
+  tbody.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>#</th><th>Usuario</th><th>Fecha</th><th>Estado</th><th>Recursos</th><th>Costo</th></tr></thead>
+    <tbody>${historial.slice(0,5).map(p=>`<tr>
+      <td><strong>#${p.id}</strong></td>
+      <td>${p.usuario}</td>
+      <td>${p.fecha}</td>
+      <td><span class="badge badge-${p.estado}">${p.estado}</span></td>
+      <td>${p.recursos}</td>
+      <td><strong>$${p.costoTotal.toFixed(2)}</strong></td>
+    </tr>`).join('')}</tbody></table></div>`;
+}
+
+// ── Catálogo ─────────────────────────────────────────────
+async function loadCatalogo() {
+  const data = await fetch(`${API}/catalogo`).then(r=>r.json());
+  const grid = document.getElementById('catalogo-grid');
+  if (!data.length) { grid.innerHTML='<div class="empty">Sin recursos.</div>'; return; }
+  grid.innerHTML = data.map(r => `
+    <div class="resource-card">
+      <div class="rc-tipo"><span class="badge badge-${r.tipo}">${r.tipo.replace('_',' ')}</span></div>
+      <div class="rc-titulo">${r.titulo}</div>
+      <div class="rc-autor">${r.autor}</div>
+      <div class="rc-footer">
+        <span class="rc-costo">$${r.costoBase.toFixed(2)}</span>
+        <span class="rc-codigo">${r.codigo}</span>
+      </div>
+    </div>`).join('');
+}
+
+// ── Historial ─────────────────────────────────────────────
+async function loadHistorial() {
+  const data = await fetch(`${API}/historial`).then(r=>r.json());
+  const tbody = document.getElementById('historial-body');
+  if (!data.length) { tbody.innerHTML='<tr><td colspan="6" class="empty">Sin préstamos.</td></tr>'; return; }
+  tbody.innerHTML = data.map(p=>`<tr>
+    <td><strong>#${p.id}</strong></td>
+    <td>${p.usuario}</td>
+    <td>${p.fecha}</td>
+    <td><span class="badge badge-${p.estado}">${p.estado}</span></td>
+    <td>${p.recursos}</td>
+    <td><strong>$${p.costoTotal.toFixed(2)}</strong></td>
+  </tr>`).join('');
+}
+
+// ── Nuevo Préstamo ────────────────────────────────────────
+async function loadUsuarios() {
+  const data = await fetch(`${API}/usuarios`).then(r=>r.json());
+  const sel = document.getElementById('sel-usuario');
+  sel.innerHTML = data.map(u=>`<option value="${u.id}">${u.nombre} (${u.codigo})</option>`).join('');
+}
+
+function actualizarServicio() {
+  const tipo = document.getElementById('r-tipo').value;
+  const sel  = document.getElementById('r-servicio');
+  sel.innerHTML = SERVICIOS[tipo].map(s=>`<option value="${s.val}">${s.label}</option>`).join('');
+}
+
+function agregarRecurso() {
+  const tipo     = document.getElementById('r-tipo').value;
+  const titulo   = document.getElementById('r-titulo').value.trim() || 'Sin título';
+  const autor    = document.getElementById('r-autor').value.trim()  || 'Desconocido';
+  const servicio = document.getElementById('r-servicio').value;
+  const svcObj   = SERVICIOS[tipo].find(s=>s.val===servicio);
+  const codigo   = tipo.substring(0,2).toUpperCase() + '-WEB-' + String(recursosLista.length+1).padStart(3,'0');
+
+  recursosLista.push({ tipo, titulo, autor, codigo, servicio, dias: tipo==='revista'?14:7 });
+  renderRecursos();
+
+  document.getElementById('r-titulo').value = '';
+  document.getElementById('r-autor').value  = '';
+}
+
+function quitarRecurso(i) {
+  recursosLista.splice(i,1);
+  renderRecursos();
+}
+
+function renderRecursos() {
+  const lista = document.getElementById('recursos-lista');
+  const vacio = document.getElementById('recursos-vacio');
+  vacio.style.display = recursosLista.length ? 'none' : 'block';
+
+  lista.innerHTML = recursosLista.map((r,i)=>`
+    <div class="item">
+      <div><div class="item-label">Tipo</div><div class="item-val"><span class="badge badge-${r.tipo}">${r.tipo.replace('_',' ')}</span></div></div>
+      <div><div class="item-label">Título</div><div class="item-val">${r.titulo}</div></div>
+      <div><div class="item-label">Servicio</div><div class="item-val">${r.servicio}</div></div>
+      <div><div class="item-label">Costo</div><div class="item-val rc-costo">$${(COSTOS_BASE[r.tipo] + (SERVICIOS[r.tipo].find(s=>s.val===r.servicio)?.costo||0)).toFixed(2)}</div></div>
+      <button class="btn btn-danger btn-sm" onclick="quitarRecurso(${i})">✕</button>
+    </div>`).join('');
+
+  const total = recursosLista.reduce((s,r)=>
+    s + COSTOS_BASE[r.tipo] + (SERVICIOS[r.tipo].find(sv=>sv.val===r.servicio)?.costo||0), 0);
+  document.getElementById('costo-total').textContent = '$' + total.toFixed(2);
+}
+
+async function crearPrestamo() {
+  const alert  = document.getElementById('alert-nuevo');
+  const btn    = document.getElementById('btn-crear');
+  const userId = parseInt(document.getElementById('sel-usuario').value);
+
+  if (!userId)              { showAlert(alert,'error','Selecciona un usuario.');            return; }
+  if (!recursosLista.length){ showAlert(alert,'error','Agrega al menos un recurso.');       return; }
+
+  btn.innerHTML = '<span class="spinner"></span> Procesando…';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`${API}/prestamos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ usuarioId: userId, recursos: recursosLista })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Error del servidor');
+
+    showAlert(alert,'success',`✓ Préstamo #${data.id} creado para ${data.usuario}. Costo total: $${data.costoTotal.toFixed(2)}`);
+    recursosLista = [];
+    renderRecursos();
+  } catch(e) {
+    showAlert(alert,'error','Error: ' + e.message);
+  } finally {
+    btn.innerHTML = 'Confirmar préstamo';
+    btn.disabled = false;
+  }
+}
+
+function showAlert(el, type, msg) {
+  el.className = `alert alert-${type} show`;
+  el.textContent = msg;
+  setTimeout(()=>el.classList.remove('show'), 6000);
+}
+
+// Inicializar
+actualizarServicio();
+loadDashboard();
+</script>
+</body>
+</html>

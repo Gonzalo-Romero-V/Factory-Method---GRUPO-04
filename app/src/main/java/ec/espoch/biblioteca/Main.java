@@ -2,6 +2,7 @@ package ec.espoch.biblioteca;
 
 import ec.espoch.biblioteca.db.DatabaseManager;
 import ec.espoch.biblioteca.db.PrestamoRepository;
+import ec.espoch.biblioteca.web.WebServer;
 import ec.espoch.biblioteca.domain.*;
 import ec.espoch.biblioteca.factory.BibliotecaFactory;
 import ec.espoch.biblioteca.servicios.*;
@@ -17,6 +18,12 @@ public class Main {
         System.setOut(new PrintStream(System.out, true, "UTF-8"));
         System.setErr(new PrintStream(System.err, true, "UTF-8"));
         Logger.getLogger("org.flywaydb").setLevel(Level.SEVERE);
+
+        if (args.length > 0 && args[0].equalsIgnoreCase("--web")) {
+            DatabaseManager.getInstance(); // inicializa DB y migraciones
+            WebServer.start();
+            return;
+        }
 
         // ── Inicialización ────────────────────────────────────────────────────
         DatabaseManager db = DatabaseManager.getInstance();

@@ -35,8 +35,12 @@ cd Factory-Method---GRUPO-04/app
 mvnw.cmd clean package        # Windows
 ./mvnw clean package          # Linux / Mac
 
-# 3. Ejecutar
+# 3a. Modo consola (demo del patrón)
 java -jar target/biblioteca.jar
+
+# 3b. Modo web (interfaz gráfica)
+java -jar target/biblioteca.jar --web
+# → Abrir http://localhost:7000
 ```
 
 ---
