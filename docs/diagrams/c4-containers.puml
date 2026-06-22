@@ -1,0 +1,19 @@
+@startuml c4-containers
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title Diagrama de Contenedores — Sistema de Biblioteca Digital
+
+Person(usuario, "Usuario", "Ejecuta la aplicación")
+
+System_Boundary(biblioteca, "Sistema de Biblioteca Digital") {
+    Container(app, "Aplicación de Consola", "Java 17 / Maven", "Punto de entrada. Orquesta el flujo: crea recursos via Factory, gestiona préstamos y persiste en BD.")
+    ContainerDb(db, "Base de Datos H2", "H2 file-based (JDBC)", "Persiste: usuarios, recursos, prestamos, detalles, notificaciones.")
+    Container(migrations, "Migraciones Flyway", "SQL scripts en classpath", "V1__schema.sql crea tablas. V2__seed_data.sql inserta datos de prueba al primer inicio.")
+}
+
+Rel(usuario, app, "Ejecuta", "java -jar biblioteca.jar")
+Rel(app, db, "Lee y escribe", "JDBC / SQL")
+Rel(migrations, db, "Inicializa esquema y datos", "Flyway al arrancar")
+
+SHOW_LEGEND()
+@enduml

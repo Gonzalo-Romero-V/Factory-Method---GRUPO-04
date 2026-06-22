@@ -2,6 +2,12 @@
 context/
 vault/
 
+# H2 database generada localmente
+app/data/
+
+# PlantUML jar (descargado localmente)
+docs/diagrams/plantuml.jar
+
 # Java
 *.class
 *.jar
