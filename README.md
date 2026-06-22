@@ -1,34 +1,39 @@
-# Sistema de Préstamos - Biblioteca Digital
-### Patrón de Diseño: Factory Method
-**Arquitectura de Software — ESPOCH, Facultad de Informática y Electrónica**
+# Sistema de Préstamos — Biblioteca Digital
+**Patrón de Diseño: Factory Method**
+
+Arquitectura de Software · ESPOCH · Facultad de Informática y Electrónica · Ingeniería de Software
 
 **Grupo 04:** Daniel Quizhpi · Joel Caiza · Erik Yumi · Gonzalo Romero · Mateo López
 
 ---
 
-## Requisitos del sistema
+## Descripción
 
-| Herramienta | Versión mínima | Verificar con |
-|---|---|---|
-| **Java JDK** | 17+ | `java -version` |
-| Git | 2.x | `git --version` |
-
-> **Maven NO necesita estar instalado.** El proyecto incluye Maven Wrapper (`mvnw`) que lo descarga automáticamente.
+Sistema de consola en Java que gestiona el préstamo de recursos académicos (libros físicos, digitales, revistas, tesis y audiolibros) aplicando el Patrón Factory Method para la creación desacoplada de recursos.
 
 ---
 
-## Reproducir el proyecto (3 pasos)
+## Requisitos
+
+| Herramienta | Versión | Verificar |
+|---|---|---|
+| **Java JDK** | **17+** | `java -version` |
+| Git | cualquier | `git --version` |
+
+> Maven **no necesita instalarse**. El repositorio incluye Maven Wrapper que lo descarga automáticamente.
+
+---
+
+## Ejecutar el proyecto
 
 ```bash
 # 1. Clonar
 git clone https://github.com/Gonzalo-Romero-V/Factory-Method---GRUPO-04.git
 cd Factory-Method---GRUPO-04/app
 
-# 2. Compilar (Windows)
-mvnw.cmd clean package
-
-# 2. Compilar (Linux / Mac)
-./mvnw clean package
+# 2. Compilar
+mvnw.cmd clean package        # Windows
+./mvnw clean package          # Linux / Mac
 
 # 3. Ejecutar
 java -jar target/biblioteca.jar
@@ -36,101 +41,69 @@ java -jar target/biblioteca.jar
 
 ---
 
-## Estructura del proyecto
+## Estructura del repositorio
 
 ```
 Factory-Method---GRUPO-04/
-├── app/                          # Código fuente Java (Maven)
-│   ├── mvnw / mvnw.cmd           # Maven Wrapper (no requiere Maven instalado)
-│   ├── pom.xml                   # Configuración del proyecto
+│
+├── README.md                        ← este archivo
+│
+├── app/                             ← código fuente Java
+│   ├── mvnw / mvnw.cmd              ← Maven Wrapper (no requiere Maven instalado)
+│   ├── pom.xml
 │   └── src/main/java/ec/espoch/biblioteca/
-│       ├── Main.java             # Punto de entrada — flujo funcional completo
-│       ├── domain/               # Entidades del dominio
+│       ├── Main.java                ← punto de entrada, flujo completo
+│       ├── domain/                  ← entidades del dominio
 │       │   ├── Usuario.java
 │       │   ├── RecursoBibliografico.java   (abstract)
 │       │   ├── Prestamo.java
 │       │   ├── DetallePrestamo.java
 │       │   └── Notificacion.java
-│       ├── recursos/             # Productos concretos del Factory Method
+│       ├── recursos/                ← productos concretos del Factory Method
 │       │   ├── LibroFisico.java
 │       │   ├── LibroDigital.java
 │       │   ├── Revista.java
 │       │   ├── Tesis.java
 │       │   └── Audiolibro.java
-│       ├── factory/              # Patrón Factory Method
-│       │   ├── RecursoFactory.java         (Creator — abstract)
-│       │   └── BibliotecaFactory.java      (ConcreteCreator)
-│       └── servicios/            # Servicios adicionales por composición
-│           ├── ServicioAdicional.java      (interface)
+│       ├── factory/                 ← implementación del patrón
+│       │   ├── RecursoFactory.java  (Creator abstract)
+│       │   └── BibliotecaFactory.java (ConcreteCreator)
+│       └── servicios/               ← servicios adicionales por composición
+│           ├── ServicioAdicional.java  (interface)
 │           ├── EnvioDomicilio.java
 │           ├── DescargaOffline.java
 │           ├── PrestamoExtendido.java
 │           ├── CertificadoLectura.java
 │           └── AccesoPremium.java
-└── docs/                         # Vault de documentación (PlantUML + decisiones)
-    ├── diagrams/                 # Diagramas C4 en PlantUML (.puml)
-    ├── decisions/                # Architecture Decision Records (ADR)
-    └── requirements/             # Requisitos y reglas de negocio
+│
+└── docs/                            ← entregables de la práctica
+    └── diagrams/                    ← diagramas C4 (PlantUML)
+        ├── c4-context.puml
+        ├── c4-containers.puml
+        └── c4-components.puml
 ```
 
----
-
-## Arquitectura — Patrón Factory Method
-
-```
-«abstract»                      «interface»
-RecursoFactory                  RecursoBibliografico
-+ crearRecurso(tipo): RB  ────► + titulo, autor, codigo, costoBase
-        ▲                       + calcularCosto(): double
-        │                       + obtenerDescripcion(): String
-BibliotecaFactory                       ▲
-+ crearRecurso(tipo): RB        ┌───────┼───────┬──────┬───────┐
-  → switch(tipo)          LibroFisico  LibroDigital  Revista  Tesis  Audiolibro
-  → lanza excepción       + servicios: List<ServicioAdicional>
-    si tipo inválido
-```
+> Las carpetas `context/` y `vault/` son **locales** y están excluidas del repositorio.
 
 ---
 
-## Reglas de negocio
+## Diagramas C4 (PlantUML)
 
-| Recurso | Servicio permitido | Restricción |
-|---|---|---|
-| `LibroFisico` | `EnvioDomicilio` | — |
-| `LibroDigital` | `DescargaOffline` | — |
-| `Revista` | `PrestamoExtendido` | Máximo **14 días** (estándar bibliográfico universitario) |
-| `Tesis` | `CertificadoLectura` | — |
-| `Audiolibro` | `AccesoPremium` | — |
-| Cualquier recurso | — | No se puede prestar sin usuario asociado |
+Los diagramas están en `docs/diagrams/`. Para renderizarlos:
 
----
-
-## Costos base por tipo de recurso
-
-| Recurso | Costo base (USD) | Servicio adicional | Costo extra (USD) |
-|---|---|---|---|
-| Libro Físico | 3.00 | Envío a domicilio | 2.50 |
-| Libro Digital | 1.50 | Descarga offline | 1.00 |
-| Revista | 1.00 | Préstamo extendido | 0.50/día extra |
-| Tesis | 2.00 | Certificado de lectura | 3.00 |
-| Audiolibro | 2.50 | Acceso premium | 2.00 |
-
----
-
-## Diagramas C4
-
-Los diagramas están en `docs/diagrams/` en formato PlantUML (`.puml`).
-
-Para generarlos como imagen:
 ```bash
-# Requiere Java y PlantUML jar descargado
-java -jar plantuml.jar docs/diagrams/*.puml
+# Descargar PlantUML (una sola vez)
+# https://plantuml.com/download
+
+java -jar plantuml.jar docs/diagrams/c4-context.puml
+java -jar plantuml.jar docs/diagrams/c4-containers.puml
+java -jar plantuml.jar docs/diagrams/c4-components.puml
 ```
 
 ---
 
 ## Tecnologías
 
-- **Java 17** (OpenJDK Temurin)
-- **Maven 3.9+** (via Maven Wrapper — sin instalación manual)
-- **PlantUML** — diagramas C4 arquitectónicos
+- **Java 17** — lenguaje principal
+- **Maven 3.9** — build tool (via Maven Wrapper, sin instalación manual)
+- **PlantUML** — diagramas arquitectónicos C4

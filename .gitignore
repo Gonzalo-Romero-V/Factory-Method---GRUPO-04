@@ -1,5 +1,6 @@
-# Contexto local - no subir al repo
+# Local only - no subir al repo
 context/
+vault/
 
 # Java
 *.class
