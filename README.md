@@ -36,11 +36,28 @@ mvnw.cmd clean package        # Windows
 ./mvnw clean package          # Linux / Mac
 
 # 3a. Modo consola (demo del patrón)
-java -jar target/biblioteca.jar
+java -Dfile.encoding=UTF-8 -jar target/biblioteca.jar
 
 # 3b. Modo web (interfaz gráfica)
-java -jar target/biblioteca.jar --web
+java -Dfile.encoding=UTF-8 -jar target/biblioteca.jar --web
 # → Abrir http://localhost:7000
+```
+
+> **Windows:** la flag `-Dfile.encoding=UTF-8` es necesaria para que tildes y ñ
+> se muestren correctamente en la consola. Sin ella el JAR funciona igual,
+> pero la salida de texto puede verse con caracteres extraños (`?` o `Ã©`).
+
+## Re-renderizar diagramas PlantUML
+
+```bash
+# Descargar plantuml.jar (una sola vez) desde https://plantuml.com/download
+# Colocar en: vault/diagrams/plantuml.jar  (ignorado por git)
+
+java -Dfile.encoding=UTF-8 -jar vault/diagrams/plantuml.jar vault/diagrams/c4-context.puml
+java -Dfile.encoding=UTF-8 -jar vault/diagrams/plantuml.jar vault/diagrams/c4-containers.puml
+java -Dfile.encoding=UTF-8 -jar vault/diagrams/plantuml.jar vault/diagrams/c4-components-prestamos.puml
+
+# Copiar los PNG generados a docs/diagrams/
 ```
 
 ---

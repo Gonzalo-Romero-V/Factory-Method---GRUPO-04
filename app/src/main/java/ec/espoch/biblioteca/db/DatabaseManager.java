@@ -2,6 +2,7 @@ package ec.espoch.biblioteca.db;
 
 import org.flywaydb.core.Flyway;
 
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -20,6 +21,7 @@ public class DatabaseManager {
             Flyway.configure()
                     .dataSource(url, USER, PASS)
                     .locations("classpath:db/migration")
+                    .encoding(StandardCharsets.UTF_8)
                     .load()
                     .migrate();
             connection = DriverManager.getConnection(url, USER, PASS);
